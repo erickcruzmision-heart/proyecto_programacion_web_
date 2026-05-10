@@ -1,0 +1,21 @@
+{
+  "name": "proyecto_programacion_web_",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión de Tutorías Académicas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erickcruzmision-heart/proyecto_programacion_web_.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/erickcruzmision-heart/proyecto_programacion_web_/issues"
+  },
+  "homepage": "https://github.com/erickcruzmision-heart/proyecto_programacion_web_#readme"
+}
