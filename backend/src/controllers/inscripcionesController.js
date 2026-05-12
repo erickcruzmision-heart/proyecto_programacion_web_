@@ -106,8 +106,101 @@ const cancelarInscripcion = async (req, res) => {
     }
 };
 
+const obtenerInscripcionesPorEstudiante = async (req, res) => {
+    try {
+        const { id_estudiante } = req.params;
+
+        const result = await pool.query(`
+            SELECT 
+                i.id_inscripcion,
+                i.id_estudiante,
+                e.nombre || ' ' || e.apellido AS estudiante,
+                i.id_grupo,
+                c.nombre AS curso,
+                g.codigo AS grupo,
+                g.modalidad,
+                g.aula,
+                g.dia,
+                g.hora_inicio,
+                g.hora_final,
+                i.fecha_inscripcion,
+                i.estado
+            FROM inscripcion i
+            INNER JOIN estudiante e ON e.id_estudiante = i.id_estudiante
+            INNER JOIN grupo g ON g.id_grupo = i.id_grupo
+            INNER JOIN curso c ON c.id_curso = g.id_curso
+            WHERE i.id_estudiante = $1
+            ORDER BY i.estado DESC, g.dia, g.hora_inicio
+        `, [id_estudiante]);
+
+        res.json({
+            success: true,
+            data: result.rows
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener inscripciones del estudiante',
+            error: error.message
+        });
+    }
+};
+
+const obtenerHorarioEstudiante = async (req, res) => {
+    try {
+        const { id_estudiante } = req.params;
+
+        const result = await pool.query(`
+            SELECT 
+                c.nombre AS curso,
+                g.codigo AS grupo,
+                d.nombre || ' ' || d.apellido AS docente,
+                g.modalidad,
+                g.aula,
+                g.dia,
+                g.hora_inicio,
+                g.hora_final
+            FROM inscripcion i
+            INNER JOIN grupo g ON g.id_grupo = i.id_grupo
+            INNER JOIN curso c ON c.id_curso = g.id_curso
+            INNER JOIN docente d ON d.id_docente = g.id_docente
+            WHERE i.id_estudiante = $1
+                AND i.estado = TRUE
+            ORDER BY 
+                CASE g.dia
+                    WHEN 'Lunes' THEN 1
+                    WHEN 'Martes' THEN 2
+                    WHEN 'Miércoles' THEN 3
+                    WHEN 'Miercoles' THEN 3
+                    WHEN 'Jueves' THEN 4
+                    WHEN 'Viernes' THEN 5
+                    WHEN 'Sábado' THEN 6
+                    WHEN 'Sabado' THEN 6
+                    WHEN 'Domingo' THEN 7
+                    ELSE 8
+                END,
+                g.hora_inicio
+        `, [id_estudiante]);
+
+        res.json({
+            success: true,
+            data: result.rows
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener horario del estudiante',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     obtenerInscripciones,
     crearInscripcion,
-    cancelarInscripcion
+    cancelarInscripcion,
+    obtenerInscripcionesPorEstudiante,
+    obtenerHorarioEstudiante
 };

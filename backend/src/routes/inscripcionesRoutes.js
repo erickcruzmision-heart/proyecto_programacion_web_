@@ -1,10 +1,29 @@
-    const express = require('express');
-    const router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-    const inscripcionesController = require('../controllers/inscripcionesController');
+const inscripcionesController = require('../controllers/inscripcionesController');
+const { verificarToken } = require('../middlewares/authMiddleware');
 
-    router.get('/', inscripcionesController.obtenerInscripciones);
-    router.post('/', inscripcionesController.crearInscripcion);
-    router.put('/cancelar/:id', inscripcionesController.cancelarInscripcion);
+router.get('/', verificarToken, inscripcionesController.obtenerInscripciones);
 
-    module.exports = router;
+router.get(
+    '/estudiante/:id_estudiante',
+    verificarToken,
+    inscripcionesController.obtenerInscripcionesPorEstudiante
+);
+
+router.get(
+    '/horario/:id_estudiante',
+    verificarToken,
+    inscripcionesController.obtenerHorarioEstudiante
+);
+
+router.post('/', verificarToken, inscripcionesController.crearInscripcion);
+
+router.put(
+    '/cancelar/:id',
+    verificarToken,
+    inscripcionesController.cancelarInscripcion
+);
+
+module.exports = router;
